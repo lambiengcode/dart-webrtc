@@ -388,4 +388,7 @@ class RTCPeerConnectionWeb extends RTCPeerConnection {
       peerConnectionId: _peerConnectionId,
     );
   }
+
+  @override
+  String get peerConnectionId => _peerConnectionId;
 }
