@@ -1,6 +1,6 @@
 import 'dart:html';
 import 'dart:js_util' as jsutil;
-import 'package:webrtc_interface/webrtc_interface.dart';
+import 'package:webrtc_interface_plus/webrtc_interface_plus.dart';
 
 import 'media_stream_track_impl.dart';
 import 'rtc_rtp_parameters_impl.dart';

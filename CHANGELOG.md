@@ -1,6 +1,10 @@
 # Changelog
 
 --------------------------------------------
+[1.1.3+1] - 2024-03-21
+
+* Add get peerConnectionId
+
 [1.1.2] - 2023-09-14
 
 * Add more frame cryptor api.

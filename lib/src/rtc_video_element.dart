@@ -1,6 +1,6 @@
 import 'dart:html' as html;
 
-import '../dart_webrtc.dart';
+import '../dart_webrtc_plus.dart';
 
 class RTCVideoElement {
   RTCVideoElement() {

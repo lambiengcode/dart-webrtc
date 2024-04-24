@@ -6,7 +6,7 @@ import 'dart:js_util' as jsutil;
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
-import 'package:webrtc_interface/webrtc_interface.dart';
+import 'package:webrtc_interface_plus/webrtc_interface_plus.dart';
 
 import 'rtc_rtp_receiver_impl.dart';
 import 'rtc_rtp_sender_impl.dart';

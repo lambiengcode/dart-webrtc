@@ -1,4 +1,4 @@
-import '../dart_webrtc.dart';
+import '../dart_webrtc_plus.dart';
 
 class MediaDevices {
   @Deprecated(

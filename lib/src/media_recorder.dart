@@ -1,6 +1,6 @@
-import 'package:webrtc_interface/src/media_recorder.dart' as _interface;
+import 'package:webrtc_interface_plus/src/media_recorder.dart' as _interface;
 
-import '../dart_webrtc.dart';
+import '../dart_webrtc_plus.dart';
 
 class MediaRecorder extends _interface.MediaRecorder {
   MediaRecorder() : _delegate = mediaRecorder();

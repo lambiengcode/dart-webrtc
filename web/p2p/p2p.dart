@@ -1,6 +1,6 @@
 import 'dart:html' as html;
 
-import 'package:dart_webrtc/dart_webrtc.dart';
+import 'package:dart_webrtc_plus/dart_webrtc_plus.dart';
 import 'package:js/js.dart';
 import 'package:test/test.dart';
 

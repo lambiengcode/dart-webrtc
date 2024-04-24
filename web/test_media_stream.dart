@@ -1,4 +1,4 @@
-import 'package:dart_webrtc/dart_webrtc.dart';
+import 'package:dart_webrtc_plus/dart_webrtc_plus.dart';
 import 'package:test/test.dart';
 
 MediaStream? mediaStream;

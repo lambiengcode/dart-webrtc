@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:html' as html;
 import 'package:js/js.dart';
-import 'package:webrtc_interface/webrtc_interface.dart';
+import 'package:webrtc_interface_plus/webrtc_interface_plus.dart';
 
 import 'frame_cryptor_impl.dart';
 import 'media_recorder_impl.dart';

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:dart_webrtc/dart_webrtc.dart';
+import 'package:dart_webrtc_plus/dart_webrtc_plus.dart';
 
 import 'random_string.dart';
 import 'simple_websocket.dart';
@@ -232,7 +232,7 @@ class Signaling {
       print('onOpen');
       onStateChange?.call(SignalingState.ConnectionOpen);
       _send('new',
-          {'name': 'dart_webrtc', 'id': _selfId, 'user_agent': 'broswer'});
+          {'name': 'dart_webrtc_plus', 'id': _selfId, 'user_agent': 'broswer'});
     };
 
     _socket?.onMessage = (message) {

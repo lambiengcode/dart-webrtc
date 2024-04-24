@@ -1,6 +1,6 @@
-library dart_webrtc;
+library dart_webrtc_plus;
 
-export 'package:webrtc_interface/webrtc_interface.dart'
+export 'package:webrtc_interface_plus/webrtc_interface_plus.dart'
     hide MediaDevices, MediaRecorder, Navigator;
 
 export 'src/factory_impl.dart';
