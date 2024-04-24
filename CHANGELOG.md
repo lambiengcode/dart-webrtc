@@ -1,7 +1,7 @@
 # Changelog
 
 --------------------------------------------
-[1.4.4] - 2024-04-24
+[1.4.4+1] - 2024-04-24
 
 * fix: datachannel message parse for Firefox.
 * fix: tryCatch editing mediaConstraints #34
