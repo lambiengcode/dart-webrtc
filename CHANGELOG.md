@@ -1,6 +1,10 @@
 # Changelog
 
 --------------------------------------------
+[1.4.4+2] - 2024-04-25
+
+* fix: listen "negotiationneeded" on web
+ 
 [1.4.4+1] - 2024-04-24
 
 * fix: datachannel message parse for Firefox.

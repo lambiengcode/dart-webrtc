@@ -155,6 +155,12 @@ class RTCPeerConnectionWeb extends RTCPeerConnection {
         }.toJS);
 
     _jsPc.addEventListener(
+        'negotiationneeded',
+        (_) {
+          onRenegotiationNeeded?.call();
+        }.toJS);
+
+    _jsPc.addEventListener(
         'track',
         (web.RTCTrackEvent trackEvent) {
           onTrack?.call(
