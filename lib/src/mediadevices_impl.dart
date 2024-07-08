@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:js' as js;
 import 'dart:js_interop';
 import 'dart:js_util' as jsutil;
+
 import 'package:web/web.dart' as web;
 import 'package:webrtc_interface_plus/webrtc_interface_plus.dart';
 
@@ -25,6 +26,28 @@ class MediaDevicesWeb extends MediaDevices {
       } catch (e) {
         print(
             '[getUserMedia] failed to remove facingMode from mediaConstraints');
+      }
+      try {
+        if (mediaConstraints['audio'] is Map<String, dynamic> &&
+            Map.from(mediaConstraints['audio']).containsKey('optional') &&
+            mediaConstraints['audio']['optional']
+                is List<Map<String, dynamic>>) {
+          List<Map<String, dynamic>> optionalValues =
+              mediaConstraints['audio']['optional'];
+          final audioMap = <String, dynamic>{};
+
+          optionalValues.forEach((option) {
+            option.forEach((key, value) {
+              audioMap[key] = value;
+            });
+          });
+
+          mediaConstraints['audio'].remove('optional');
+          mediaConstraints['audio'].addAll(audioMap);
+        }
+      } catch (e, s) {
+        print(
+            '[getUserMedia] failed to translate optional audio constraints, $e, $s');
       }
 
       final mediaDevices = web.window.navigator.mediaDevices;

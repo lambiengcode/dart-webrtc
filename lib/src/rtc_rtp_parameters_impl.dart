@@ -1,5 +1,6 @@
 import 'dart:js_util' as jsutil;
-import 'package:webrtc_interface_plus/webrtc_interface_plus.dart';
+
+import 'package:dart_webrtc_plus/dart_webrtc_plus.dart';
 
 class RTCRtpParametersWeb {
   static RTCRtpParameters fromJsObject(Object object) {

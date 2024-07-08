@@ -1,11 +1,28 @@
 # Changelog
 
 --------------------------------------------
-[1.4.4+2] - 2024-04-25
+[1.4.6+1] - 2024-07-08
 
-* fix: listen "negotiationneeded" on web
- 
-[1.4.4+1] - 2024-04-24
+* update .
+
+[1.4.6+hotfix.1] - 2024-06-07
+
+* Wider version dependencies for js/http.
+
+[1.4.6] - 2024-06-05
+
+* chore: bump version for js and http.
+* fix: decrypting audio when e2ee.
+* fix: translate audio constraints for web.
+* fix: missing fault tolerance, better worker reports and a increased timeout for worker tasks.
+* fix type cast exception in getConstraints()
+
+[1.4.5] - 2024-05-13
+
+* fix: negotiationNeeded listener.
+* fix: fix type cast exception in getConstraints().
+
+[1.4.4] - 2024-04-24
 
 * fix: datachannel message parse for Firefox.
 * fix: tryCatch editing mediaConstraints #34
