@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:js_interop';
-import 'dart:js_util' as js_util;
+import 'dart:js_interop_unsafe';
+
 import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
@@ -16,8 +17,10 @@ import 'e2ee.logger.dart';
 external web.DedicatedWorkerGlobalScope get self;
 
 extension PropsRTCTransformEventHandler on web.DedicatedWorkerGlobalScope {
+  JSObject get jsObject => this as JSObject;
+
   set onrtctransform(Function(dynamic) callback) =>
-      js_util.setProperty<Function>(this, 'onrtctransform', callback);
+      jsObject.setProperty('onrtctransform'.toJS, callback.toJS);
 }
 
 var participantCryptors = <FrameCryptor>[];
@@ -63,7 +66,7 @@ void main() async {
 
   logger.info('Worker created');
 
-  if (js_util.getProperty(self, 'RTCTransformEvent') != null) {
+  if (self.getProperty('RTCTransformEvent'.toJS) != null) {
     logger.info('setup RTCTransformEvent event handler');
     self.onrtctransform = (web.RTCTransformEvent event) {
       logger.info('Got onrtctransform event');
@@ -72,12 +75,12 @@ void main() async {
       transformer.handled = true;
 
       var options = transformer.options;
-      var kind = js_util.getProperty(options, 'kind');
-      var participantId = js_util.getProperty(options, 'participantId');
-      var trackId = js_util.getProperty(options, 'trackId');
-      var codec = js_util.getProperty(options, 'codec');
-      var msgType = js_util.getProperty(options, 'msgType');
-      var keyProviderId = js_util.getProperty(options, 'keyProviderId');
+      var kind = options.getProperty('kind');
+      var participantId = options.getProperty('participantId');
+      var trackId = options.getProperty('trackId');
+      var codec = options.getProperty('codec');
+      var msgType = options.getProperty('msgType');
+      var keyProviderId = options.getProperty('keyProviderId');
 
       var keyProvider = keyProviders[keyProviderId];
 

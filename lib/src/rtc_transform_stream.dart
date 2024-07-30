@@ -1,89 +1,97 @@
-import 'dart:js_util' as js_util;
-import 'dart:typed_data';
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
 
-import 'package:js/js.dart';
 import 'package:web/web.dart';
 
 @JS('WritableStream')
-abstract class WritableStream {
+extension type WritableStream._(JSObject _) implements JSObject {
   external void abort();
   external void close();
   external bool locked();
   external WritableStream clone();
 }
 
+// ReadableStream class with instance members
 @JS('ReadableStream')
-abstract class ReadableStream {
+extension type ReadableStream._(JSObject _) implements JSObject {
   external void cancel();
   external bool locked();
-  external ReadableStream pipeThrough(dynamic transformStream);
+  external ReadableStream pipeThrough(TransformStream transformStream);
   external void pipeTo(WritableStream writableStream);
   external ReadableStream clone();
 }
 
+// TransformStream class with generative constructor and instance members
 @JS('TransformStream')
-class TransformStream {
-  external TransformStream(dynamic);
+extension type TransformStream._(JSObject _) implements JSObject {
+  external factory TransformStream(JSAny? arg);
   external ReadableStream get readable;
   external WritableStream get writable;
 }
 
-@anonymous
+// Abstract class with instance methods
 @JS()
-abstract class TransformStreamDefaultController {
-  external void enqueue(dynamic chunk);
-  external void error(dynamic error);
+extension type TransformStreamDefaultController._(JSObject _)
+    implements JSObject {
+  external void enqueue(JSAny? chunk);
+  external void error(JSAny? error);
   external void terminate();
 }
 
-@anonymous
+// EncodedStreams class with instance members
 @JS()
-class EncodedStreams {
+extension type EncodedStreams._(JSObject _) implements JSObject {
   external ReadableStream get readable;
   external WritableStream get writable;
 }
 
+// RTCEncodedFrame class with instance members
 @JS()
-class RTCEncodedFrame {
+extension type RTCEncodedFrame._(JSObject _) implements JSObject {
   external int get timestamp;
-  external ByteBuffer get data;
-  external set data(ByteBuffer data);
+  external JSArrayBuffer get data;
+  external set data(JSArrayBuffer data);
   external RTCEncodedFrameMetadata getMetadata();
   external String? get type;
 }
 
+// RTCEncodedAudioFrame class with instance members
 @JS()
-class RTCEncodedAudioFrame {
+extension type RTCEncodedAudioFrame._(JSObject _) implements JSObject {
   external int get timestamp;
-  external ByteBuffer get data;
-  external set data(ByteBuffer data);
+  external JSArrayBuffer get data;
+  external set data(JSArrayBuffer data);
   external int? get size;
   external RTCEncodedAudioFrameMetadata getMetadata();
 }
 
+// RTCEncodedVideoFrame class with instance members
 @JS()
-class RTCEncodedVideoFrame {
+extension type RTCEncodedVideoFrame._(JSObject _) implements JSObject {
   external int get timestamp;
-  external ByteBuffer get data;
-  external set data(ByteBuffer data);
+  external JSArrayBuffer get data;
+  external set data(JSArrayBuffer data);
   external String get type;
   external RTCEncodedVideoFrameMetadata getMetadata();
 }
 
+// RTCEncodedFrameMetadata class with instance members
 @JS()
-class RTCEncodedFrameMetadata {
+extension type RTCEncodedFrameMetadata._(JSObject _) implements JSObject {
   external int get payloadType;
   external int get synchronizationSource;
 }
 
+// RTCEncodedAudioFrameMetadata class with instance members
 @JS()
-class RTCEncodedAudioFrameMetadata {
+extension type RTCEncodedAudioFrameMetadata._(JSObject _) implements JSObject {
   external int get payloadType;
   external int get synchronizationSource;
 }
 
+// RTCEncodedVideoFrameMetadata class with instance members
 @JS()
-class RTCEncodedVideoFrameMetadata {
+extension type RTCEncodedVideoFrameMetadata._(JSObject _) implements JSObject {
   external int get frameId;
   external int get width;
   external int get height;
@@ -91,39 +99,49 @@ class RTCEncodedVideoFrameMetadata {
   external int get synchronizationSource;
 }
 
+// RTCTransformEvent class with a factory constructor
 @JS('RTCTransformEvent')
-class RTCTransformEvent {
+extension type RTCTransformEvent._(JSObject _) implements JSObject {
   external factory RTCTransformEvent();
 }
 
+// Extension for RTCTransformEvent
 extension PropsRTCTransformEvent on RTCTransformEvent {
   RTCRtpScriptTransformer get transformer =>
-      js_util.getProperty(this, 'transformer');
+      (this as JSObject).getProperty('transformer'.toJS);
 }
 
+// RTCRtpScriptTransformer class with a factory constructor
 @JS()
-@staticInterop
-class RTCRtpScriptTransformer {
+extension type RTCRtpScriptTransformer._(JSObject _) implements JSObject {
   external factory RTCRtpScriptTransformer();
 }
 
+// Extension for RTCRtpScriptTransformer
 extension PropsRTCRtpScriptTransformer on RTCRtpScriptTransformer {
-  ReadableStream get readable => js_util.getProperty(this, 'readable');
-  WritableStream get writable => js_util.getProperty(this, 'writable');
-  dynamic get options => js_util.getProperty(this, 'options');
-  Future<int> generateKeyFrame([String? rid]) => js_util
-      .promiseToFuture(js_util.callMethod(this, 'generateKeyFrame', [rid]));
+  JSObject get jsObject => this as JSObject;
+  ReadableStream get readable => jsObject.getProperty('readable'.toJS);
+  WritableStream get writable => jsObject.getProperty('writable'.toJS);
+  dynamic get options => jsObject.getProperty('options'.toJS);
+  Future<int> generateKeyFrame([String? rid]) async {
+    final val = await JSPromise(
+            jsObject.callMethod('generateKeyFrame'.toJS, rid.jsify()))
+        .toDart;
 
-  Future<void> sendKeyFrameRequest() => js_util
-      .promiseToFuture(js_util.callMethod(this, 'sendKeyFrameRequest', []));
+    return val.dartify() is int ? val.dartify() as int : 0;
+  }
+
+  Future<void> sendKeyFrameRequest() =>
+      JSPromise(jsObject.callMethod('sendKeyFrameRequest'.toJS)).toDart;
 
   set handled(bool value) {
-    js_util.setProperty(this, 'handled', value);
+    jsObject.setProperty('handled'.toJS, value.toJS);
   }
 }
 
+// RTCRtpScriptTransform class with a factory constructor
 @JS('RTCRtpScriptTransform')
-class RTCRtpScriptTransform {
+extension type RTCRtpScriptTransform._(JSObject _) implements JSObject {
   external factory RTCRtpScriptTransform(Worker worker,
-      [dynamic options, Iterable<dynamic>? transfer]);
+      [JSAny? options, JSArray<JSAny>? transfer]);
 }

@@ -1,5 +1,5 @@
 import 'package:dart_webrtc_plus/dart_webrtc_plus.dart';
-import 'package:js/js.dart';
+
 import 'package:test/test.dart';
 import 'package:web/web.dart' as web;
 
@@ -30,13 +30,13 @@ void main() {
 
   remote?.append(remoteVideo.htmlElement);
 
-  signaling.onLocalStream = allowInterop((MediaStream stream) {
+  signaling.onLocalStream = (MediaStream stream) {
     localVideo.srcObject = stream;
-  });
+  };
 
-  signaling.onAddRemoteStream = allowInterop((MediaStream stream) {
+  signaling.onAddRemoteStream = (MediaStream stream) {
     remoteVideo.srcObject = stream;
-  });
+  };
 
   signaling.connect();
   signaling.onStateChange = (SignalingState state) {

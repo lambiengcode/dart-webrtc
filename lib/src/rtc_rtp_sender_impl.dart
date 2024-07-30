@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:js_util' as jsutil;
-
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
 import 'package:dart_webrtc_plus/src/media_stream_impl.dart';
 import 'package:web/web.dart' as web;
 import 'package:webrtc_interface_plus/webrtc_interface_plus.dart';
@@ -24,9 +24,11 @@ class RTCRtpSenderWeb extends RTCRtpSender {
     try {
       if (track != null) {
         var nativeTrack = track as MediaStreamTrackWeb;
-        jsutil.callMethod(_jsRtpSender, 'replaceTrack', [nativeTrack.jsTrack]);
+        _jsRtpSender.callMethod('replaceTrack'.toJS, nativeTrack.jsTrack);
       } else {
-        jsutil.callMethod(_jsRtpSender, 'replaceTrack', [null]);
+        _jsRtpSender.callMethod(
+          'replaceTrack'.toJS,
+        );
       }
     } on Exception catch (e) {
       throw 'Unable to RTCRtpSender::replaceTrack: ${e.toString()}';
@@ -39,9 +41,9 @@ class RTCRtpSenderWeb extends RTCRtpSender {
     try {
       if (track != null) {
         var nativeTrack = track as MediaStreamTrackWeb;
-        jsutil.callMethod(_jsRtpSender, 'setTrack', [nativeTrack.jsTrack]);
+        _jsRtpSender.callMethod('setTrack'.toJS, nativeTrack.jsTrack);
       } else {
-        jsutil.callMethod(_jsRtpSender, 'setTrack', [null]);
+        _jsRtpSender.callMethod('setTrack'.toJS);
       }
     } on Exception catch (e) {
       throw 'Unable to RTCRtpSender::setTrack: ${e.toString()}';
@@ -52,8 +54,8 @@ class RTCRtpSenderWeb extends RTCRtpSender {
   Future<void> setStreams(List<MediaStream> streams) async {
     try {
       final nativeStreams = streams.cast<MediaStreamWeb>();
-      jsutil.callMethod(_jsRtpSender, 'setStreams',
-          nativeStreams.map((e) => e.jsStream).toList());
+      _jsRtpSender.callMethod('setStreams'.toJS,
+          nativeStreams.map((e) => e.jsStream).toList().jsify());
     } on Exception catch (e) {
       throw 'Unable to RTCRtpSender::setStreams: ${e.toString()}';
     }
@@ -61,21 +63,22 @@ class RTCRtpSenderWeb extends RTCRtpSender {
 
   @override
   RTCRtpParameters get parameters {
-    var parameters = jsutil.callMethod(_jsRtpSender, 'getParameters', []);
-    return RTCRtpParametersWeb.fromJsObject(parameters);
+    var parameters = _jsRtpSender.callMethod('getParameters'.toJS);
+    return RTCRtpParametersWeb.fromJsObject(parameters.dartify()!);
   }
 
   @override
   Future<bool> setParameters(RTCRtpParameters parameters) async {
     try {
-      var oldParameters = jsutil.callMethod(_jsRtpSender, 'getParameters', []);
-      jsutil.setProperty(
-          oldParameters,
-          'encodings',
-          jsutil.jsify(
-              parameters.encodings?.map((e) => e.toMap()).toList() ?? []));
-      await jsutil.promiseToFuture<void>(
-          jsutil.callMethod(_jsRtpSender, 'setParameters', [oldParameters]));
+      var oldParameters =
+          _jsRtpSender.callMethod('getParameters'.toJS) as JSObject?;
+      oldParameters?.setProperty(
+        'encodings'.toJS,
+        (parameters.encodings?.map((e) => e.toMap()).toList() ?? []).jsify(),
+      );
+      await JSPromise(
+              _jsRtpSender.callMethod('setParameters'.toJS, oldParameters))
+          .toDart;
       return Future<bool>.value(true);
     } on Exception catch (e) {
       throw 'Unable to RTCRtpSender::setParameters: ${e.toString()}';
@@ -84,10 +87,14 @@ class RTCRtpSenderWeb extends RTCRtpSender {
 
   @override
   Future<List<StatsReport>> getStats() async {
-    var stats = await jsutil.promiseToFuture<dynamic>(
-        jsutil.callMethod(_jsRtpSender, 'getStats', []));
+    var stats =
+        await JSPromise(_jsRtpSender.callMethod('getStats'.toJS)).toDart;
     var report = <StatsReport>[];
-    stats.forEach((key, value) {
+    var statsDart = stats.dartify();
+
+    if (statsDart is! Map) return report;
+
+    statsDart.forEach((key, value) {
       report.add(
           StatsReport(value['id'], value['type'], value['timestamp'], value));
     });
@@ -110,7 +117,7 @@ class RTCRtpSenderWeb extends RTCRtpSender {
 
   @override
   RTCDTMFSender get dtmfSender =>
-      RTCDTMFSenderWeb(jsutil.getProperty(_jsRtpSender, 'dtmf'));
+      RTCDTMFSenderWeb(_jsRtpSender.getProperty('dtmf'.toJS));
 
   @override
   Future<void> dispose() async {}

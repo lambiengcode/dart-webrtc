@@ -1,7 +1,8 @@
-import 'dart:js' as js;
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
+
 import 'dart:typed_data';
 
-import 'package:js/js_util.dart';
 import 'package:web/web.dart' as web;
 
 import 'crypto.dart' as crypto;
@@ -11,36 +12,48 @@ bool isE2EESupported() {
 }
 
 bool isScriptTransformSupported() {
-  return js.context['RTCRtpScriptTransform'] != null;
+  return globalContext.has('RTCRtpScriptTransform');
+}
+
+JSObject? get rtpSenderPrototype {
+  final rtpSender = globalContext.getProperty('RTCRtpSender'.toJS) as JSObject?;
+
+  if (rtpSender == null) return null;
+
+  final prototype = rtpSender.getProperty('prototype'.toJS) as JSObject?;
+
+  return prototype;
 }
 
 bool isInsertableStreamSupported() {
-  return js.context['RTCRtpSender'] != null &&
-      js.context['RTCRtpSender']['prototype']['createEncodedStreams'] != null;
+  return globalContext.has('RTCRtpSender') &&
+      rtpSenderPrototype?.getProperty('createEncodedStreams'.toJS) != null;
 }
 
 Future<web.CryptoKey> importKey(
     Uint8List keyBytes, String algorithm, String usage) {
   // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey
-  return promiseToFuture<web.CryptoKey>(crypto.importKey(
+  return JSPromise<web.CryptoKey>(crypto.importKey(
     'raw',
     crypto.jsArrayBufferFrom(keyBytes),
-    js.JsObject.jsify({'name': algorithm}),
+    {'name': algorithm}.jsify(),
     false,
     usage == 'derive' ? ['deriveBits', 'deriveKey'] : ['encrypt', 'decrypt'],
-  ));
+  ) as JSFunction)
+      .toDart;
 }
 
 Future<web.CryptoKey> createKeyMaterialFromString(
     Uint8List keyBytes, String algorithm, String usage) {
   // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/importKey
-  return promiseToFuture<web.CryptoKey>(crypto.importKey(
+  return JSPromise<web.CryptoKey>(crypto.importKey(
     'raw',
     crypto.jsArrayBufferFrom(keyBytes),
-    js.JsObject.jsify({'name': 'PBKDF2'}),
+    {'name': 'PBKDF2'}.jsify(),
     false,
     ['deriveBits', 'deriveKey'],
-  ));
+  ) as JSFunction)
+      .toDart;
 }
 
 dynamic getAlgoOptions(String algorithmName, Uint8List salt) {

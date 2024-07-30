@@ -1,5 +1,7 @@
 import 'dart:async';
-import 'dart:js_util' as jsutil;
+import 'dart:html_common';
+import 'dart:js_interop';
+
 import 'dart:typed_data';
 
 import 'package:web/web.dart' as web;
@@ -145,7 +147,7 @@ class ParticipantKeyHandler {
       return null;
     }
     try {
-      var key = await jsutil.promiseToFuture<ByteBuffer>(
+      var key = await promiseToFuture<ByteBuffer>(
           crypto.exportKey('raw', currentMaterial));
       return key.asUint8List();
     } catch (e) {
@@ -169,7 +171,7 @@ class ParticipantKeyHandler {
 
   Future<web.CryptoKey> ratchetMaterial(
       web.CryptoKey currentMaterial, ByteBuffer newKeyBuffer) async {
-    var newMaterial = await jsutil.promiseToFuture(crypto.importKey(
+    var newMaterial = await promiseToFuture(crypto.importKey(
       'raw',
       newKeyBuffer,
       (currentMaterial.algorithm as crypto.Algorithm).name,
@@ -210,11 +212,10 @@ class ParticipantKeyHandler {
 
     // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/deriveKey#HKDF
     // https://developer.mozilla.org/en-US/docs/Web/API/HkdfParams
-    var encryptionKey =
-        await jsutil.promiseToFuture<web.CryptoKey>(crypto.deriveKey(
-      jsutil.jsify(algorithmOptions),
+    var encryptionKey = await promiseToFuture<web.CryptoKey>(crypto.deriveKey(
+      algorithmOptions.jsify(),
       material,
-      jsutil.jsify({'name': 'AES-GCM', 'length': 128}),
+      {'name': 'AES-GCM', 'length': 128}.jsify(),
       false,
       ['encrypt', 'decrypt'],
     ));
@@ -229,8 +230,8 @@ class ParticipantKeyHandler {
     var algorithmOptions = getAlgoOptions('PBKDF2', salt);
 
     // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/deriveBits
-    var newKey = await jsutil.promiseToFuture<ByteBuffer>(
-        crypto.deriveBits(jsutil.jsify(algorithmOptions), material, 256));
+    var newKey = await promiseToFuture<ByteBuffer>(
+        crypto.deriveBits(algorithmOptions.jsify(), material, 256));
     return newKey.asUint8List();
   }
 }

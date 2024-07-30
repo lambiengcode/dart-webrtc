@@ -8,10 +8,10 @@ environment:
 
 dependencies:
   collection: ^1.17.1
-  js: ">0.6.0 <0.8.0"
   logging: ^1.1.0
   meta: ^1.8.0
-  platform_detect: ^2.0.7
+  platform_detect:
+    path: /Users/lambiengcode/Documents/platform_detect
   synchronized: ^3.0.0+3
   web: ^0.5.1
   webrtc_interface_plus: ^1.2.0+1

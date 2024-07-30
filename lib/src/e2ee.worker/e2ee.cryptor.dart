@@ -1,7 +1,8 @@
 import 'dart:async';
+import 'dart:html_common';
 import 'dart:js';
 import 'dart:js_interop';
-import 'dart:js_util' as jsutil;
+
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -238,10 +239,10 @@ class FrameCryptor {
       logger.info('setting codec on cryptor to $codec');
       this.codec = codec;
     }
-    var transformer = TransformStream(jsutil.jsify({
+    var transformer = TransformStream({
       'transform':
           allowInterop(operation == 'encode' ? encodeFunction : decodeFunction)
-    }));
+    }.jsify());
     try {
       readable.pipeThrough(transformer).pipeTo(writable);
     } catch (e) {
@@ -262,7 +263,7 @@ class FrameCryptor {
 
   int getUnencryptedBytes(RTCEncodedFrame frame, String? codec) {
     if (codec != null && codec.toLowerCase() == 'h264') {
-      var data = frame.data.asUint8List();
+      var data = frame.data.toDart.asUint8List();
       var naluIndices = findNALUIndices(data);
       for (var index in naluIndices) {
         var type = parseNALUType(data[index]);
@@ -296,7 +297,7 @@ class FrameCryptor {
     RTCEncodedFrame frame,
     TransformStreamDefaultController controller,
   ) async {
-    var buffer = frame.data.asUint8List();
+    var buffer = frame.data.toDart.asUint8List();
 
     if (!enabled ||
         // skip for encryption for empty dtx frames
@@ -339,7 +340,7 @@ class FrameCryptor {
       frameTrailer.setInt8(0, IV_LENGTH);
       frameTrailer.setInt8(1, keyIndex);
 
-      var cipherText = await jsutil.promiseToFuture<ByteBuffer>(crypto.encrypt(
+      var cipherText = await promiseToFuture<ByteBuffer>(crypto.encrypt(
         crypto.AesGcmParams(
           name: 'AES-GCM',
           iv: crypto.jsArrayBufferFrom(iv),
@@ -358,7 +359,7 @@ class FrameCryptor {
       finalBuffer.add(cipherText.asUint8List());
       finalBuffer.add(iv);
       finalBuffer.add(frameTrailer.buffer.asUint8List());
-      frame.data = crypto.jsArrayBufferFrom(finalBuffer.toBytes());
+      frame.data = crypto.jsArrayBufferFrom(finalBuffer.toBytes()).toJS;
 
       controller.enqueue(frame);
 
@@ -399,7 +400,7 @@ class FrameCryptor {
     TransformStreamDefaultController controller,
   ) async {
     var ratchetCount = 0;
-    var buffer = frame.data.asUint8List();
+    var buffer = frame.data.toDart.asUint8List();
     ByteBuffer? decrypted;
     KeySet? initialKeySet;
     var initialKeyIndex = currentKeyIndex;
@@ -429,7 +430,7 @@ class FrameCryptor {
             var finalBuffer = BytesBuilder();
             finalBuffer.add(Uint8List.fromList(
                 buffer.sublist(0, buffer.length - (magicBytes.length + 1))));
-            frame.data = crypto.jsArrayBufferFrom(finalBuffer.toBytes());
+            frame.data = crypto.jsArrayBufferFrom(finalBuffer.toBytes()).toJS;
             logger.fine('enqueing silent frame');
             controller.enqueue(frame);
           } else {
@@ -480,7 +481,7 @@ class FrameCryptor {
       var currentkeySet = initialKeySet;
 
       Future<void> decryptFrameInternal() async {
-        decrypted = await jsutil.promiseToFuture<ByteBuffer>(
+        decrypted = await promiseToFuture<ByteBuffer>(
           crypto.decrypt(
             crypto.AesGcmParams(
               name: 'AES-GCM',
@@ -566,7 +567,7 @@ class FrameCryptor {
 
       finalBuffer.add(Uint8List.fromList(buffer.sublist(0, headerLength)));
       finalBuffer.add(decrypted!.asUint8List());
-      frame.data = crypto.jsArrayBufferFrom(finalBuffer.toBytes());
+      frame.data = crypto.jsArrayBufferFrom(finalBuffer.toBytes()).toJS;
       controller.enqueue(frame);
 
       if (lastError != CryptorError.kOk) {

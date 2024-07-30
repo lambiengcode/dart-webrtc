@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'dart:js_util' as jsutil;
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
 
 import 'package:webrtc_interface_plus/webrtc_interface_plus.dart';
 
@@ -43,14 +44,14 @@ class RTCRtpTransceiverInitWeb extends RTCRtpTransceiverInit {
 }
 
 extension RTCRtpTransceiverInitWebExt on RTCRtpTransceiverInit {
-  dynamic toJsObject() => jsutil.jsify({
+  dynamic toJsObject() => {
         'direction': typeRtpTransceiverDirectionToString[direction],
         if (streams != null)
           'streams':
               streams!.map((e) => (e as MediaStreamWeb).jsStream).toList(),
         if (sendEncodings != null)
           'sendEncodings': sendEncodings!.map((e) => e.toMap()).toList(),
-      });
+      }.jsify();
 }
 
 class RTCRtpTransceiverWeb extends RTCRtpTransceiver {
@@ -64,29 +65,31 @@ class RTCRtpTransceiverWeb extends RTCRtpTransceiver {
 
   Object _jsTransceiver;
 
+  JSObject get _jsOTransceiver => _jsTransceiver as JSObject;
+
   @override
   Future<TransceiverDirection?> getCurrentDirection() async =>
       typeStringToRtpTransceiverDirection[
-          jsutil.getProperty(_jsTransceiver, 'currentDirection')];
+          _jsOTransceiver.getProperty('currentDirection'.toJS)];
 
   @override
   Future<TransceiverDirection> getDirection() async =>
       typeStringToRtpTransceiverDirection[
-          jsutil.getProperty(_jsTransceiver, 'direction')]!;
+          _jsOTransceiver.getProperty('direction'.toJS)]!;
 
   @override
-  String get mid => jsutil.getProperty(_jsTransceiver, 'mid');
+  String get mid => _jsOTransceiver.getProperty('mid'.toJS);
 
   @override
-  RTCRtpSender get sender => RTCRtpSenderWeb.fromJsSender(
-      jsutil.getProperty(_jsTransceiver, 'sender'));
+  RTCRtpSender get sender =>
+      RTCRtpSenderWeb.fromJsSender(_jsOTransceiver.getProperty('sender'.toJS));
 
   @override
   RTCRtpReceiver get receiver =>
-      RTCRtpReceiverWeb(jsutil.getProperty(_jsTransceiver, 'receiver'));
+      RTCRtpReceiverWeb(_jsOTransceiver.getProperty('receiver'.toJS));
 
   @override
-  bool get stoped => jsutil.getProperty(_jsTransceiver, 'stopped');
+  bool get stoped => _jsOTransceiver.getProperty('stopped'.toJS);
 
   @override
   String get transceiverId => mid;
@@ -94,8 +97,10 @@ class RTCRtpTransceiverWeb extends RTCRtpTransceiver {
   @override
   Future<void> setDirection(TransceiverDirection direction) async {
     try {
-      jsutil.setProperty(_jsTransceiver, 'direction',
-          typeRtpTransceiverDirectionToString[direction]);
+      _jsOTransceiver.setProperty(
+        'direction'.toJS,
+        typeRtpTransceiverDirectionToString[direction].jsify(),
+      );
     } on Exception catch (e) {
       throw 'Unable to RTCRtpTransceiver::setDirection: ${e.toString()}';
     }
@@ -104,7 +109,7 @@ class RTCRtpTransceiverWeb extends RTCRtpTransceiver {
   @override
   Future<void> stop() async {
     try {
-      jsutil.callMethod(_jsTransceiver, 'stop', []);
+      _jsOTransceiver.callMethod('stop'.toJS);
     } on Exception catch (e) {
       throw 'Unable to RTCRtpTransceiver::stop: ${e..toString()}';
     }
@@ -113,8 +118,10 @@ class RTCRtpTransceiverWeb extends RTCRtpTransceiver {
   @override
   Future<void> setCodecPreferences(List<RTCRtpCodecCapability> codecs) async {
     try {
-      jsutil.callMethod(_jsTransceiver, 'setCodecPreferences',
-          [jsutil.jsify(codecs.map((e) => e.toMap()).toList())]);
+      _jsOTransceiver.callMethod(
+        'setCodecPreferences'.toJS,
+        codecs.map((e) => e.toMap()).toList().jsify(),
+      );
     } on Exception catch (e) {
       throw 'Unable to RTCRtpTransceiver::setCodecPreferences: ${e..toString()}';
     }

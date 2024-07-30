@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:js_util' as jsutil;
+import 'dart:html_common';
+import 'dart:js_interop';
 import 'dart:typed_data';
 
-import 'package:js/js.dart';
 import 'package:web/web.dart' as web;
 
 @JS('Promise')
@@ -84,10 +84,10 @@ external Promise<ByteBuffer> deriveBits(
 Future<web.CryptoKey> impportKeyFromRawData(List<int> secretKeyData,
     {required String webCryptoAlgorithm,
     required List<String> keyUsages}) async {
-  return jsutil.promiseToFuture<web.CryptoKey>(importKey(
+  return promiseToFuture<web.CryptoKey>(importKey(
     'raw',
     jsArrayBufferFrom(secretKeyData),
-    jsutil.jsify({'name': webCryptoAlgorithm}),
+    {'name': webCryptoAlgorithm}.jsify(),
     false,
     keyUsages,
   ));

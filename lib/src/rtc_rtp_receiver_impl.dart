@@ -1,4 +1,5 @@
-import 'dart:js_util' as jsutil;
+import 'dart:js_interop';
+import 'dart:js_interop_unsafe';
 
 import 'package:web/web.dart' as web;
 import 'package:webrtc_interface_plus/webrtc_interface_plus.dart';
@@ -14,10 +15,15 @@ class RTCRtpReceiverWeb extends RTCRtpReceiver {
 
   @override
   Future<List<StatsReport>> getStats() async {
-    var stats = await jsutil.promiseToFuture<dynamic>(
-        jsutil.callMethod(_jsRtpReceiver, 'getStats', []));
+    var stats =
+        await JSPromise(_jsRtpReceiver.callMethod('getStats'.toJS)).toDart;
     var report = <StatsReport>[];
-    stats.forEach((key, value) {
+
+    var statsDart = stats.dartify();
+
+    if (statsDart is! Map) return report;
+
+    statsDart.forEach((key, value) {
       report.add(
           StatsReport(value['id'], value['type'], value['timestamp'], value));
     });
@@ -29,8 +35,8 @@ class RTCRtpReceiverWeb extends RTCRtpReceiver {
   /// http://ortc.org/wp-content/uploads/2016/03/ortc.html#rtcrtpparameters*.
   @override
   RTCRtpParameters get parameters {
-    var parameters = jsutil.callMethod(_jsRtpReceiver, 'getParameters', []);
-    return RTCRtpParametersWeb.fromJsObject(parameters);
+    var parameters = _jsRtpReceiver.callMethod('getParameters'.toJS);
+    return RTCRtpParametersWeb.fromJsObject(parameters.dartify()!);
   }
 
   @override
