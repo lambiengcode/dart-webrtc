@@ -5,7 +5,7 @@ import 'dart:js_interop_unsafe';
 
 import 'package:dart_webrtc_plus/dart_webrtc_plus.dart';
 
-import 'package:platform_detect/platform_detect.dart';
+import 'package:platform_detect_wasm/platform_detect_wasm.dart';
 import 'package:web/web.dart' as web;
 
 import 'media_stream_track_impl.dart';

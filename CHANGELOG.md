@@ -1,6 +1,10 @@
 # Changelog
 
 --------------------------------------------
+[1.4.6+2] - 2024-07-30
+
+* chore: migrate code for support flutter web wasm
+
 [1.4.6+1] - 2024-07-08
 
 * update .
