@@ -64,21 +64,12 @@ class MediaDevicesWeb extends MediaDevices {
         final jsStream = await _getUserMedia(args).toDart;
         return MediaStreamWeb(jsStream, 'local');
       } else {
-        final streamCompleter = Completer<web.MediaStream>();
-
-        web.window.navigator.getUserMedia(
-            web.MediaStreamConstraints(
+        final jsStream = await web.window.navigator.mediaDevices
+            .getUserMedia(web.MediaStreamConstraints(
               audio: mediaConstraints['audio'],
               video: mediaConstraints['video'],
-            ),
-            (web.MediaStream stream) {
-              streamCompleter.complete(stream);
-            }.toJS,
-            (JSAny err) {
-              streamCompleter.completeError(err);
-            }.toJS);
-
-        final jsStream = await streamCompleter.future;
+            ))
+            .toDart;
         return MediaStreamWeb(jsStream, 'local');
       }
     } catch (e) {
@@ -99,20 +90,11 @@ class MediaDevicesWeb extends MediaDevices {
 
         return MediaStreamWeb(jsStream, 'local');
       } else {
-        final streamCompleter = Completer<web.MediaStream>();
-
-        final video = {'mediaSource': 'screen'}.jsify()!;
-
-        web.window.navigator.getUserMedia(
-            web.MediaStreamConstraints(
-                video: video, audio: mediaConstraints['audio'] ?? false),
-            (web.MediaStream stream) {
-              streamCompleter.complete(stream);
-            }.toJS,
-            (JSAny err) {
-              streamCompleter.completeError(err);
-            }.toJS);
-        final jsStream = await streamCompleter.future;
+        final jsStream = await web.window.navigator.mediaDevices
+            .getUserMedia(web.MediaStreamConstraints(
+                video: {'mediaSource': 'screen'}.jsify()!,
+                audio: mediaConstraints['audio'] ?? false))
+            .toDart;
         return MediaStreamWeb(jsStream, 'local');
       }
     } catch (e) {

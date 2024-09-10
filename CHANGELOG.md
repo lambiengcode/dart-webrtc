@@ -1,13 +1,19 @@
 # Changelog
 
 --------------------------------------------
-[1.4.6+2] - 2024-07-30
 
-* chore: migrate code for support flutter web wasm
+[1.4.9+1] - 2024-09-10
 
-[1.4.6+1] - 2024-07-08
+* bump web version to 1.0.0.
 
-* update .
+[1.4.8] - 2024-07-12
+
+* fix: missing streamCompleter complete for getUserMedia.
+* fix: RTCPeerConnectionWeb.getRemoteStreams.
+
+[1.4.7] - 2024-07-12
+
+* fix: MediaStreamTrack.getSettings.
 
 [1.4.6+hotfix.1] - 2024-06-07
 
